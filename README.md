@@ -1,6 +1,6 @@
 La version fonctionnelle est présente dans la branche master
 
-
+Le sujet est le suivant 02_Morpion.pdf
 
 Mode d'emploi et commandes :
 
