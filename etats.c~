@@ -1,0 +1,160 @@
+#include"etats.h"
+#include"safeInput.h"
+#include"plateau.h"
+
+void startState(context* c)
+{
+  printf("Vous jouez à....\n");
+  c->nextcall = waitInitState(c);
+}
+
+void waitInitState(context* c)
+{
+  printf(" random,load,editor\n");
+  char in[10];
+  switch(inputAlphanum(in,10))
+    {
+    case HELP :
+      /*a terme voire les fonctions d'aide*/
+      printf(" random,load,editor\n");
+      break;
+    case QUIT:
+      exit(0);
+      break;
+    case ABORT:
+      c->nextcall = startState(c);
+      break;
+    case RETURN :
+      c->nextcall = startState(c);
+      break;
+    case default :
+      if(strcmp("random",in))
+	{
+	  c->nextcall = initRandomState(c);
+	}
+      else if(strcmp("load",in))
+	{
+	  c->nextcall = initFileState(c);
+	}
+      else if(strcmp("editor",in))
+	{
+	  c->nextcall = initEditorState(c);
+	}
+      else c->nextcall = waitInitState(c);
+    }
+}
+
+void initRandomState(context* c)
+{
+  switch(inputInt(&(c->m_num1),10,50))
+    {
+    case HELP :
+      /*a terme voire les fonctions d'aide*/
+      printf("entrer un nombre entre 10 et 50\n");
+      break;
+    case QUIT:
+      exit(0);
+      break;
+    case ABORT:
+      c->nextcall = startState(c);
+      break;
+    case RETURN :
+      c->nextcall = waitInitState(c);
+      break;
+    case default:
+      c->m_board = createBoard();
+      c->m_string = NULL;
+      if(initRandom(c->m_board,c->m_num1))
+	{
+	  printf("Erreur dans la création d'un plateau aléatoire de taille %d",c->m_num1);
+	  exit(1);
+	}
+      printf("Regles du jeu");/*il faut appeler la fonction help du jeu*/
+      c->nextcall = waitInitState(c);
+    }
+}
+
+void waitMoveState(context* c)
+{
+  char in[10];
+  switch(inputAlphanum(in,10))
+    {
+    case HELP :
+      printf("play,save,show\n");
+      break;
+    case QUIT:
+      exit(0);
+      break;
+    case ABORT:
+      c->nextcall = startState(c);
+      break;
+    case RETURN :
+      /*historique !*/
+      break;
+    case default :
+      if(strcmp("play",in))
+	{
+	  c->nextcall = enterXState(c);
+	}
+      else if(strcmp("save",in))
+	{
+	  c->nextcall = saveBoardState(c);
+	}
+      else if(strcmp("show",in))
+	{
+	  /*il faut appeler la fonction d'affichage des coups possibles*/
+	}
+      else c->nextcall = waitMovesState(c);
+    }
+}
+
+void enterXState(context* c)
+{
+  switch(inputInt(&(c->m_num1),0,(c->m_board).size_x))
+    {
+    case HELP :
+      /*a terme voire les fonctions d'aide*/
+      printf("entrer une coordonnée entre 0 et %d\n",(c->m_board).size_x));
+      break;
+    case QUIT:
+      exit(0);
+      break;
+    case ABORT:
+      c->nextcall = startState(c);
+      break;
+    case RETURN :
+      c->nextcall = waitMoveState(c);
+      break;
+    case default:
+      c->nextcall = enterYState(c);
+    }
+}
+
+void enterYState(context* c)
+{
+  switch(inputInt(&(c->m_num2),0,(c->m_board).size_y))
+    {
+    case HELP :
+      /*a terme voire les fonctions d'aide*/
+      printf("entrer une coordonnée entre 0 et %d\n",(c->m_board).size_y));
+      break;
+    case QUIT:
+      exit(0);
+      break;
+    case ABORT:
+      c->nextcall = startState(c);
+      break;
+    case RETURN :
+      c->nextcall = enterXState(c);
+      break;
+    case default:
+      switch(isValidMove(c->m_board,c->m_num1,c->m_num2))
+	{
+	case 0:
+	  /*problème ici,que retourne la fonction getPossibleLines ?*/
+	  break;
+	case 1:
+	  break;
+	}
+    }
+}
